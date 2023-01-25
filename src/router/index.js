@@ -1,29 +1,66 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import HomeView from "../views/Home.vue";
+import LoginView from "../views/Login.vue";
+import PDFView from "../views/CovertImagesToPdf.vue";
+import ArchivesView from "../views/Archives.vue";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: "/",
+    name: "home",
+    component: HomeView,
+    beforeEnter: loggedIn,
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: "/login",
+    name: "login",
+    component: LoginView,
+    beforeEnter: redirect,
+  },
+  {
+    path: "/add_archives",
+    name: "archives",
+    component: ArchivesView,
+    beforeEnter: loggedIn,
+  },
+  {
+    path: "/convert-images-to-pdf",
+    name: "pdf",
+    component: PDFView,
+    beforeEnter: loggedIn,
+  },
+];
+// function admin(to, from, next) {
+//   const user_name = localStorage.getItem("user_name");
+//   if (user_name !== 'admin') {
+//     next("/");
+//   } else {
+//     next();
+//   }
+// }
+function loggedIn(to, from, next) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    next("/login");
+  } else {
+    next();
   }
-]
-
+}
+function redirect(to, from, next) {
+  const token = localStorage.getItem("token");
+  if (token) {
+    next("/");
+  } else {
+    next();
+  }
+}
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
