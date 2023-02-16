@@ -3,7 +3,11 @@
     class="font-weight-black"
     :value="value"
     :type="type"
+    :color="color"
     :label="label"
+    :loading="loading"
+    :prepend-icon="icon"
+    clearable
     @input="$emit('update-value', $event)"
     :hint="hint"
     lazy-rules
@@ -17,11 +21,17 @@
     props: {
       type: String,
       label: String,
-
+      icon: String,
+      color: String,
       value: String,
       rules: {
         type: Array,
         required: false,
+      },
+      loading: {
+        type: Boolean,
+        required: false,
+        default: false,
       },
       appendIcon: {
         type: String,

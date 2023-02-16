@@ -5,6 +5,8 @@
     :items="items"
     :rules="rules"
     :label="label"
+    :color="color"
+    :prepend-icon="icon"
     clearable
     lazy-rules
     @input="$emit('update-value', $event)"></v-combobox>
@@ -14,6 +16,8 @@
     props: {
       label: String,
       value: String,
+      icon: String,
+      color: String,
       rules: {
         type: Array,
         required: true,

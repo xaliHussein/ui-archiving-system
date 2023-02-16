@@ -9,7 +9,7 @@
             </v-card-title>
             <v-card-text>
               <v-text-field
-                color="#16213E"
+                color="textI"
                 class="font-weight-black"
                 v-model="userName"
                 :rules="userNameRules"
@@ -17,7 +17,7 @@
                 prepend-icon="mdi-account-circle" />
 
               <v-text-field
-                color="#16213E"
+                color="textI"
                 v-model="password"
                 class="font-weight-black"
                 :type="showPassword ? 'text' : 'password'"
@@ -30,11 +30,11 @@
             <v-card-actions>
               <v-btn
                 @click="login"
-                :loading="loadingButton"
-                color="#16213E"
+                :loading="loading_login"
+                color="btnI"
                 block
                 elevation="4">
-                <h4 style="color: white; font-size: 17px">تسجيل</h4>
+                <h4 style="color: var(--v-btnI); font-size: 17px">تسجيل</h4>
                 <template v-slot:loader>
                   <span class="custom-loader">
                     <v-icon color="white">mdi-cached</v-icon>
@@ -56,16 +56,16 @@
       showPassword: false,
       userNameRules: [
         (value) => !!value || "هذا الحقل مطلوب",
-        (value) => value.length >= 3 || "الحد الادنى لعدد الاحرف هوه 3",
+        (value) => (value || "").length >= 3 || "الحد الادنى لعدد الاحرف هوه 3",
       ],
       PasswordsRules: [
         (value) => !!value || "هذا الحقل مطلوب",
-        (value) => value.length >= 6 || "الحد الادنى لعدد الاحرف هوه 6",
+        (value) => (value || "").length >= 6 || "الحد الادنى لعدد الاحرف هوه 6",
       ],
     }),
     computed: {
-      loadingButton() {
-        return this.$store.state.loading_button_login;
+      loading_login() {
+        return this.$store.state.loading_login;
       },
     },
     methods: {

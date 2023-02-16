@@ -1,7 +1,23 @@
 <template>
-  <v-container fluid>
-    <v-row class="d-flex justify-center">
-      <v-col cols="12" sm="12" md="10" lg="10" class="mt-15">
+  <v-dialog ref="dialog" v-model="dialog" persistent width="100%">
+    <template v-slot:activator="{ on, attrs }">
+      <v-text-field
+        v-model="nameFile"
+        label="اضافة ملفات"
+        type="text"
+        class="font-weight-black"
+        :rules="rules"
+        color="textI"
+        prepend-icon="mdi-file-multiple"
+        readonly
+        v-bind="attrs"
+        v-on="on"></v-text-field>
+    </template>
+    <v-card>
+      <v-toolbar class="d-flex justify-center" color="header" dark>
+        <h2 style="color: white">اضافة ملفات</h2>
+      </v-toolbar>
+      <v-card-text class="mt-3">
         <vue-dropzone
           ref="myVueDropzone"
           id="dropzone"
@@ -23,47 +39,37 @@
           </div>
         </vue-dropzone>
         <div class="text-center">
-          <v-btn
-            @click="upload"
-            :loading="loadingButton"
-            color="btnI"
-            class="mt-5 px-15"
-            elevation="4">
-            <h4 style="color: #ffffff; font-size: 17px">تحميل</h4>
-            <font-awesome
-              :icon="['fas', 'fa-cloud-arrow-up']"
-              class="fa-lg mr-2"
-              color="white" />
-            <template v-slot:loader>
-              <span class="custom-loader">
-                <v-icon color="white">mdi-cached</v-icon>
-              </span>
-            </template>
+          <v-btn @click="upload" color="btn" class="mt-5 px-15" elevation="4">
+            <h4 style="color: white; font-size: 17px">اضافة</h4>
           </v-btn>
           <v-btn
-            @click="clear_files"
-            color="white"
+            @click="cancel"
+            color="btnC"
             class="mt-5 px-15 mr-4"
             elevation="4">
-            <h4 style="color: #000000; font-size: 17px">حذف الكل</h4>
+            <h4 style="color: #000000; font-size: 17px">الغاء</h4>
           </v-btn>
         </div>
-      </v-col>
-    </v-row>
-  </v-container>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 <script>
   import vue2Dropzone from "vue2-dropzone";
   import "vue2-dropzone/dist/vue2Dropzone.min.css";
   import LottieAnimation from "lottie-vuejs/src/LottieAnimation.vue";
   export default {
-    name: "app",
-    components: {
-      vueDropzone: vue2Dropzone,
-      LottieAnimation,
+    props: {
+      rules: {
+        type: Array,
+        required: false,
+      },
     },
-    data: function () {
+    components: { vueDropzone: vue2Dropzone, LottieAnimation },
+    data() {
       return {
+        dialog: false,
+        nameFile: null,
         files: [],
         dropzoneOptions: {
           url: "http://127.0.0.1:8000/api/drop_zone",
@@ -74,20 +80,46 @@
           uploadMultiple: true,
           addRemoveLinks: true,
         },
+        pdfFile: "",
       };
-    },
-    computed: {
-      loadingButton() {
-        return this.$store.state.pdf.loadingButton;
-      },
     },
     methods: {
       // اضافة صور في مصفوفه
       after_complete_upload(response) {
+        // اذا تم رفع ملف pdf
         if (response.status == "success") {
-          let data = {};
-          data["image"] = response.dataURL;
-          this.files.push(data);
+          // اذا تم رفع ملف pdf
+          if (response.type == "application/pdf") {
+            // convert pdf to base64
+            var fileReader = new FileReader();
+            var base64;
+            fileReader.onload = (fileLoadedEvent) => {
+              base64 = fileLoadedEvent.target.result;
+              response.dataURL = base64;
+              // اضافة base64 الى مصفوفه
+              let data = {};
+              data["file"] = response.dataURL;
+              this.files.push(data);
+            };
+            fileReader.readAsDataURL(response);
+            // اذا تم رفع صور
+          } else if (response.type.substring(0, 5) == "image") {
+            let data = {};
+            data["file"] = response.dataURL;
+            this.files.push(data);
+          } else {
+            // اذا تم ارفاق ملفات غير صور و pdf
+            this.nameFile = null;
+            this.$refs.myVueDropzone.removeAllFiles();
+            let snack_message = {};
+            snack_message["color"] = "amber darken-4";
+            snack_message["icon"] = "alert-circle";
+            snack_message["text"] = "الملفات المدعومه pdf و صور فقط";
+            this.$store.commit("SNACK_MESSAGE", snack_message);
+            setTimeout(() => {
+              this.$store.commit("TIME_OUT", snack_message);
+            }, 4000);
+          }
         } else if (response.status == "error") {
           let snack_message = {};
           snack_message["color"] = "amber darken-4";
@@ -108,25 +140,15 @@
       },
       // تحميل صور على  الخادم
       upload() {
-        if (this.files[0] != null) {
-          this.$store.dispatch("pdf/upload_image", this.files).then(() => {
-            this.clear_files;
-          });
-          this.files = [];
-        } else {
-          let snack_message = {};
-          snack_message["color"] = "amber darken-4";
-          snack_message["icon"] = "alert-circle";
-          snack_message["text"] = "لم تقم بأضافة صور";
-          this.$store.commit("SNACK_MESSAGE", snack_message);
-          setTimeout(() => {
-            this.$store.commit("TIME_OUT", snack_message);
-          }, 4000);
-        }
+        this.nameFile = "files " + this.files.length;
+        this.$emit("files", this.files);
+        this.dialog = false;
       },
       // حذف كل صور
-      clear_files() {
+      cancel() {
+        this.nameFile = null;
         this.$refs.myVueDropzone.removeAllFiles();
+        this.dialog = false;
       },
     },
   };

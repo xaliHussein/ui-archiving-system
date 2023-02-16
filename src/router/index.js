@@ -3,7 +3,9 @@ import VueRouter from "vue-router";
 import HomeView from "../views/Home.vue";
 import LoginView from "../views/Login.vue";
 import PDFView from "../views/CovertImagesToPdf.vue";
-import ArchivesView from "../views/Archives.vue";
+import AddArchivesView from "../views/archives/AddArchives.vue";
+import GetArchivesView from "../views/archives/GetArchives.vue";
+import Settings from "../views/Settings.vue";
 
 Vue.use(VueRouter);
 
@@ -22,8 +24,20 @@ const routes = [
   },
   {
     path: "/add_archives",
-    name: "archives",
-    component: ArchivesView,
+    name: "add_archives",
+    component: AddArchivesView,
+    beforeEnter: loggedIn,
+  },
+  {
+    path: "/get_archives",
+    name: "get_archives",
+    component: GetArchivesView,
+    beforeEnter: loggedIn,
+  },
+  {
+    path: "/settings",
+    name: "settings",
+    component: Settings,
     beforeEnter: loggedIn,
   },
   {

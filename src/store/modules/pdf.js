@@ -37,7 +37,6 @@ const pdf = {
             resolve(response);
           })
           .catch((error) => {
-            console.log(error.response);
             state.loadingButton = false;
           });
       });

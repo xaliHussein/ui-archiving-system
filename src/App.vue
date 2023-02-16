@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="font">
     <v-main>
       <Header v-if="loggedIn" />
       <SnackBar v-if="snackBar" :snack_message="snack_message" />
@@ -10,12 +10,28 @@
 </template>
 
 <script>
-  import SnackBar from "./components/SnackBar.vue";
-  import Header from "./components/Header.vue";
-  import Lodding from "./components/Lodding.vue";
+  import SnackBar from "./components/layout/SnackBar.vue";
+  import Header from "./components/layout/Header.vue";
+  import Lodding from "./components/layout/Lodding.vue";
   export default {
     name: "App",
     components: { SnackBar, Header, Lodding },
+    mounted() {
+      const theme = localStorage.getItem("dark_theme");
+      if (theme) {
+        if (theme === "true") {
+          this.$vuetify.theme.dark = true;
+        } else {
+          this.$vuetify.theme.dark = false;
+        }
+      } else if (
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      ) {
+        this.$vuetify.theme.dark = true;
+        localStorage.setItem("dark_theme", this.$vuetify.theme.dark.toString());
+      }
+    },
     computed: {
       snack_message() {
         return this.$store.state.snack_message;
@@ -29,13 +45,15 @@
       loading() {
         return this.$store.state.loading;
       },
+      theme() {
+        return this.$vuetify.theme.dark ? "dark" : "light";
+      },
     },
   };
 </script>
 <style>
   #app {
     font-family: "Cairo", sans-serif;
-    background-color: #012059;
   }
 
   .custom-loader {

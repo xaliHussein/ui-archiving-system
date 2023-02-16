@@ -23,7 +23,7 @@
             title: "عرض ملفات",
             icon: "fa-folder-open",
             color: "color: #FFFF00",
-            link: "sale",
+            link: "get_archives",
             class: false,
           },
 
@@ -31,7 +31,7 @@
             title: "ارشفة ملفات",
             icon: "fa-file-circle-plus",
             color: "color: #4a148c",
-            link: "archives",
+            link: "add_archives",
             class: true,
           },
 

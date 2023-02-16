@@ -6,7 +6,9 @@
     :label="label"
     rows="1"
     lazy-rules
+    clearable
     :prepend-icon="icon"
+    :color="color"
     @input="$emit('update-value', $event)"
     :hint="hint"
     persistent-hint
@@ -18,6 +20,7 @@
       type: String,
       label: String,
       icon: String,
+      color: String,
       value: String,
       rules: {
         type: Array,
